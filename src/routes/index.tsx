@@ -1,5 +1,5 @@
-import { createFileRoute } from '@tanstack/react-router'
 import { Hero } from '@/sections/home/hero'
+import { createFileRoute } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/')({
   component: HomeComponent,
@@ -7,7 +7,7 @@ export const Route = createFileRoute('/')({
 
 function HomeComponent() {
   return (
-    <main className="relative flex w-full flex-col bg-white overflow-x-hidden">
+    <main className="flex max-w-full w-full overflow-x-hidden">
       <Hero />
     </main>
   )
