@@ -10,8 +10,9 @@ import { faq } from '@/content/home'
 
 /**
  * The matching FAQPage JSON-LD is added in the route's `head()`.
- * `forceMount` keeps closed answers in the prerendered HTML (with the `hidden`
- * attribute), so crawlers that ignore JSON-LD still read every answer.
+ * `forceMount` keeps closed answers in the prerendered HTML (collapsed and
+ * `visibility: hidden`), so crawlers that ignore JSON-LD still read every
+ * answer.
  */
 export function Faq() {
   return (

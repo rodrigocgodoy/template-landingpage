@@ -54,8 +54,13 @@ function AccordionContent({
       data-slot="accordion-content"
       className={cn(
         'overflow-hidden text-sm data-[state=closed]:animate-accordion-up data-[state=open]:animate-accordion-down',
-        // Force-mounted content stays in the DOM (and the prerendered HTML), so hide it while closed.
-        props.forceMount && 'data-[state=closed]:hidden',
+        // Force-mounted content stays in the DOM (and the prerendered HTML), so
+        // collapse it while closed. `visibility` flips only after the 200ms
+        // close animation (a delay, because Radix forces the transition
+        // duration to 0s inline), then hides the content from assistive tech
+        // and the tab order.
+        props.forceMount &&
+          'transition-[visibility] data-[state=closed]:invisible data-[state=closed]:h-0 data-[state=closed]:[transition-delay:200ms]',
       )}
       {...props}
     >
