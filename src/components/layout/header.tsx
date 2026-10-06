@@ -1,6 +1,7 @@
 import { Button } from '@/components/ui/button'
 import { hero, navigation } from '@/content/home'
 import { Logo } from './logo'
+import { MobileNav } from './mobile-nav'
 import { ThemeToggle } from './theme-toggle'
 
 export function Header() {
@@ -27,6 +28,7 @@ export function Header() {
           <Button asChild size="sm">
             <a href={`/${hero.primaryCta.href}`}>{hero.primaryCta.label}</a>
           </Button>
+          <MobileNav />
         </div>
       </div>
     </header>
