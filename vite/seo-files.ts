@@ -18,15 +18,19 @@ const AI_CRAWLERS = [
 ]
 
 function robotsTxt() {
-  const blocked = new Set<string>(siteConfig.disallowedBots)
+  // User-agent matching in robots.txt is case-insensitive, so compare that way
+  // too: otherwise `'gptbot'` would produce both an Allow and a Disallow group.
+  const normalize = (bot: string) => bot.toLowerCase()
+  const blocked = new Set(siteConfig.disallowedBots.map(normalize))
+  const known = new Set(AI_CRAWLERS.map(normalize))
   const groups = [
     'User-agent: *\nAllow: /',
     ...AI_CRAWLERS.map(
       bot =>
-        `User-agent: ${bot}\n${blocked.has(bot) ? 'Disallow' : 'Allow'}: /`,
+        `User-agent: ${bot}\n${blocked.has(normalize(bot)) ? 'Disallow' : 'Allow'}: /`,
     ),
-    ...[...blocked]
-      .filter(bot => !AI_CRAWLERS.includes(bot))
+    ...siteConfig.disallowedBots
+      .filter(bot => !known.has(normalize(bot)))
       .map(bot => `User-agent: ${bot}\nDisallow: /`),
   ]
   return `${groups.join('\n\n')}\n\nSitemap: ${absoluteUrl('/sitemap.xml')}\n`
@@ -83,14 +87,14 @@ function manifest() {
   )}\n`
 }
 
-const files: Record<string, { type: string; render: () => string }> = {
-  'robots.txt': { type: 'text/plain', render: robotsTxt },
-  'llms.txt': { type: 'text/plain', render: llmsTxt },
-  'manifest.webmanifest': {
-    type: 'application/manifest+json',
-    render: manifest,
-  },
-}
+const files = new Map<string, { type: string; render: () => string }>([
+  ['robots.txt', { type: 'text/plain', render: robotsTxt }],
+  ['llms.txt', { type: 'text/plain', render: llmsTxt }],
+  [
+    'manifest.webmanifest',
+    { type: 'application/manifest+json', render: manifest },
+  ],
+])
 
 /** Generates robots.txt, llms.txt and manifest.webmanifest from `src/config/site.ts`. */
 export function seoFiles(): Plugin {
@@ -98,7 +102,9 @@ export function seoFiles(): Plugin {
     name: 'seo-files',
     configureServer(server) {
       server.middlewares.use((req, res, next) => {
-        const file = files[req.url?.slice(1) ?? '']
+        // Ignore the query string (`/robots.txt?v=1`).
+        const { pathname } = new URL(req.url ?? '/', 'http://localhost')
+        const file = files.get(pathname.slice(1))
         if (!file) return next()
         res.setHeader('Content-Type', `${file.type}; charset=utf-8`)
         res.end(file.render())
@@ -106,7 +112,7 @@ export function seoFiles(): Plugin {
     },
     generateBundle() {
       if (this.environment.name !== 'client') return
-      for (const [fileName, file] of Object.entries(files)) {
+      for (const [fileName, file] of files) {
         this.emitFile({ type: 'asset', fileName, source: file.render() })
       }
     },
