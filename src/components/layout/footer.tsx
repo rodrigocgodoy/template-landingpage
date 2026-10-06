@@ -23,8 +23,8 @@ export function Footer() {
         </nav>
         <p className="text-muted-foreground text-sm">
           <small>
-            © {new Date().getFullYear()} {siteConfig.organization.name}. All
-            rights reserved.
+            © {import.meta.env.VITE_BUILD_YEAR} {siteConfig.organization.name}{' '}
+            All rights reserved.
           </small>
         </p>
       </div>
