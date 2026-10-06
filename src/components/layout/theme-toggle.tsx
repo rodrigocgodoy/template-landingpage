@@ -1,31 +1,21 @@
 import { Moon, Sun } from 'lucide-react'
-import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
-import { getTheme, setTheme, type Theme } from '@/lib/theme'
+import { getTheme, setTheme } from '@/lib/theme'
 
 export function ThemeToggle() {
-  // The real theme is only known in the browser, so start undefined to keep
-  // the prerendered HTML and the first client render identical.
-  const [theme, setThemeState] = useState<Theme>()
-
-  useEffect(() => {
-    setThemeState(getTheme())
-  }, [])
-
-  const next: Theme = theme === 'dark' ? 'light' : 'dark'
-
+  // The label and icon both follow the `dark` class (set by the inline theme
+  // script before paint), so they are correct in the prerendered HTML too:
+  // no client state, no flash, no mismatch for screen readers.
   return (
     <Button
       variant="ghost"
       size="icon"
-      aria-label={`Switch to ${next} theme`}
-      onClick={() => {
-        setTheme(next)
-        setThemeState(next)
-      }}
+      onClick={() => setTheme(getTheme() === 'dark' ? 'light' : 'dark')}
     >
       <Sun className="hidden dark:block" aria-hidden="true" />
       <Moon className="dark:hidden" aria-hidden="true" />
+      <span className="sr-only dark:hidden">Switch to dark theme</span>
+      <span className="sr-only hidden dark:inline">Switch to light theme</span>
     </Button>
   )
 }
