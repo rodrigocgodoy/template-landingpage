@@ -1,16 +1,11 @@
-import type { LucideIcon } from 'lucide-react'
-import {
-  Accessibility,
-  Bot,
-  Gauge,
-  Moon,
-  Palette,
-  SearchCheck,
-} from 'lucide-react'
-
 /**
  * Landing page copy lives here, separate from the components, so the same data
- * can drive both the UI and the structured data (e.g. the FAQ JSON-LD).
+ * can drive the UI, the structured data (e.g. the FAQ JSON-LD) and llms.txt.
+ *
+ * This file is also imported by `vite.config.ts` (through `vite/seo-files.ts`),
+ * so keep it plain data: no path aliases (`@/`), no `import.meta.env` and no
+ * React or icon imports. Icons are referenced by name and mapped to components
+ * in `src/sections/home/features.tsx`.
  */
 
 export const navigation = [
@@ -28,8 +23,16 @@ export const hero = {
   secondaryCta: { label: 'See features', href: '#features' },
 }
 
+export type FeatureIcon =
+  | 'gauge'
+  | 'search-check'
+  | 'bot'
+  | 'accessibility'
+  | 'moon'
+  | 'palette'
+
 export type Feature = {
-  icon: LucideIcon
+  icon: FeatureIcon
   title: string
   description: string
 }
@@ -40,37 +43,37 @@ export const features = {
     'Sensible defaults for performance, discoverability and accessibility, so you can focus on your message.',
   items: [
     {
-      icon: Gauge,
+      icon: 'gauge',
       title: 'Static and fast',
       description:
         'Every route is prerendered to HTML at build time and hydrated on the client. Deploy to any static host.',
     },
     {
-      icon: SearchCheck,
+      icon: 'search-check',
       title: 'SEO ready',
       description:
         'Per-page meta tags, Open Graph, canonical URLs, sitemap.xml and robots.txt generated from a single config file.',
     },
     {
-      icon: Bot,
+      icon: 'bot',
       title: 'Answer engine friendly',
       description:
         'JSON-LD structured data and an llms.txt file help AI assistants understand and cite your content.',
     },
     {
-      icon: Accessibility,
+      icon: 'accessibility',
       title: 'Accessible by default',
       description:
         'Semantic landmarks, a skip link, visible focus states and accessible components built on Radix UI.',
     },
     {
-      icon: Moon,
+      icon: 'moon',
       title: 'Dark mode',
       description:
         'Follows the system preference, remembers the visitor’s choice and never flashes the wrong theme.',
     },
     {
-      icon: Palette,
+      icon: 'palette',
       title: 'Easy to customize',
       description:
         'Tailwind CSS v4 design tokens and shadcn/ui components you own and can change freely.',
