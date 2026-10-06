@@ -41,10 +41,16 @@ pnpm dev
 
 Open <http://localhost:5173>.
 
+The dev server accepts requests from common tunnels (ngrok, Cloudflare Tunnel, localtunnel). For other hostnames, such as a Docker service name or a custom local domain, list them in `DEV_ALLOWED_HOSTS`:
+
+```bash
+DEV_ALLOWED_HOSTS=app.test,.my-company.dev pnpm dev
+```
+
 ## Make it yours
 
 1. **`src/config/site.ts`**: name, title, description, production URL, locale, social profiles, organization data and theme color. This file drives the meta tags, JSON-LD, sitemap, robots.txt, llms.txt and web manifest.
-2. **`src/content/home.ts`**: the landing page copy (hero, features, steps, FAQ and call to action).
+2. **`src/content/home.ts`**: the landing page copy (hero, features, steps, FAQ and call to action). `vite.config.ts` also reads this file to build `llms.txt`, so keep it plain data: no `@/` imports, no React and no icon components (icons are referenced by name).
 3. **`public/`**: replace `favicon.svg`, `favicon.ico`, `apple-touch-icon.png`, `icon-192.png`, `icon-512.png` and the 1200×630 `og-image.png` with your brand assets.
 4. **`src/styles/global.css`**: adjust colors, radius and fonts through the CSS variables.
 
@@ -60,7 +66,7 @@ The build generates these files from `src/config/site.ts`:
 | File | Purpose |
 | --- | --- |
 | `index.html` (per route) | Full content plus meta tags, canonical URL and JSON-LD |
-| `404.html` | Not-found page with `noindex`, served by static hosts for unknown URLs |
+| `404.html` | Not-found page with `noindex`, served by static hosts for unknown URLs. It's rendered from the catch-all route (`src/routes/$.tsx`), so it hydrates cleanly at any URL; when a server renders it, it answers with a real `404` status |
 | `sitemap.xml` | All prerendered routes, excluding in-page anchors and the 404 page |
 | `robots.txt` | Allows all crawlers, lists AI crawlers explicitly, points to the sitemap |
 | `llms.txt` | Markdown summary of the site for LLMs ([llmstxt.org](https://llmstxt.org)) |
@@ -115,9 +121,10 @@ Pass `noIndex: true` to `buildSeo` for pages that should stay out of search resu
 ├── public/                  # Static assets: icons, Open Graph image
 ├── src/
 │   ├── components/
-│   │   ├── layout/          # Header, footer, logo, skip link, theme toggle, 404
+│   │   ├── layout/          # Header, mobile nav, footer, logo, skip link, theme toggle, 404
 │   │   └── ui/              # shadcn/ui components
 │   ├── config/
+│   │   ├── prerender.ts     # Constants shared with vite.config.ts
 │   │   └── site.ts          # Site metadata: single source of truth for SEO
 │   ├── content/
 │   │   └── home.ts          # Landing page copy
@@ -125,7 +132,7 @@ Pass `noIndex: true` to `buildSeo` for pages that should stay out of search resu
 │   │   ├── seo.ts           # buildSeo() and JSON-LD helpers
 │   │   ├── theme.ts         # Theme script and helpers
 │   │   └── utils.ts         # cn() class merging helper
-│   ├── routes/              # File-based routes (TanStack Router)
+│   ├── routes/              # File-based routes (TanStack Router); `$.tsx` is the 404 page
 │   ├── sections/home/       # Landing page sections
 │   ├── styles/global.css    # Tailwind entry point and design tokens
 │   ├── router.tsx           # Router factory
